@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -44,8 +45,70 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+fun DrawScope.circle(offset: (Float) -> Offset){
+    val radius = Dp(20f).value
+    drawCircle(
+        Color.Black,
+        radius = radius,
+        center =offset(radius)
+    )
+}
+
+fun DrawScope.center(){
+    circle{
+        Offset(size.width / 2f, size.height / 2f)
+    }
+}
+
+fun DrawScope.topRight(){
+    circle{
+        Offset(size.width - it * 2f, it * 2f)
+    }
+}
+
+fun DrawScope.topLeft(){
+    circle {
+        Offset(it * 2f, it * 2f)
+    }
+}
+
+fun DrawScope.bottomLeft(){
+    circle {
+        Offset(it * 2f,size.height - (it * 2f))
+    }
+}
+
+fun DrawScope.bottomRight(){
+    circle {
+        Offset(size.width - (it * 2f),size.height - (it * 2f))
+    }
+}
+fun DrawScope.bullet(number: Int) {
+    when(number) {
+        1-> {
+            center()
+        }
+        2-> {
+            topRight()
+            bottomLeft()
+        }
+        3-> {
+            topRight()
+            center()
+            bottomLeft()
+        }
+        4 -> {
+            topLeft()
+            topRight()
+            bottomLeft()
+            bottomRight()
+
+        }
+    }
+}
+
 @Composable
-fun Dice(modifier: Modifier){
+fun Dice(number: Int, modifier: Modifier){
     Canvas(
         modifier = Modifier
             .size(96.dp, 96.dp)
@@ -55,11 +118,8 @@ fun Dice(modifier: Modifier){
             cornerRadius = CornerRadius(24f, 24f),
             size = size
         )
-        drawCircle(
-            Color.Black,
-            radius = Dp(24f).value,
-            center = Offset(size.width / 2, size.height / 2)
-        )
+
+        bullet(number = number)
     }
 }
 
@@ -74,7 +134,10 @@ fun App(modifier: Modifier = Modifier) {
         Column (
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Dice(Modifier)
+            Dice(1,Modifier)
+            Dice(2,Modifier)
+            Dice(3, Modifier)
+            Dice(4, Modifier)
 
             Spacer(modifier = Modifier.height(24.dp))
 
